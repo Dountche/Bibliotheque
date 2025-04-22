@@ -1,0 +1,208 @@
+/* Définition des couleurs personnalisées */
+:root {
+  --primary-color: #ff8c00;      /* Orange soutenu */
+  --secondary-color: #ffa500;    /* Orange clair */
+  --accent-green: #32cd32;       /* Vert vif */
+  --light-green: #90ee90;        /* Vert clair */
+  --dark-gray: #3d3d3d;
+  --footer-bg: #2c2c2c;
+}
+
+/* Ajustements globaux */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Fixation du header */
+header{
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.container-fluid,
+.navbar-collapse{
+  background-color: var(--primary-color) !important;
+  width: 110%;
+  height: auto;
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--primary-color) !important;
+  height: 100px;
+  border: solid 5px transparent;
+}
+.navbar-brand img {
+  /* Ajustement de la taille de l'image si nécessaire */
+  max-height: 70px;
+}
+
+.nav-link {
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--dark-gray) !important;
+}
+.nav-link:hover {
+  color: #fff !important;
+}
+
+.active {
+  font-weight: 500;
+  text-decoration: none;
+  color: #fff !important;
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 10px;
+  transition: transform 0.2s;
+  margin-bottom: 50px;
+}
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.btn-warning{
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+.btn-warning:hover {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+/* Footer */
+footer {
+  background-color: var(--footer-bg);
+}
+
+/* Adaptations supplémentaires */
+h1, h5 {
+  color: var(--dark-gray);
+}
+
+/* Personnalisation des sections */
+main {
+  padding-top: 100px;
+  padding-bottom: 20px;
+}
+
+/* Exemple d'animation pour la section de bienvenue */
+.text-center {
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+form {
+  max-width: 600px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.form-group,
+.form-groupta,
+.mb-3 {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  width: 100%;
+}
+.form-groupta{
+  height: 300px;
+}
+
+label {
+  width: 150px; /* largeur fixe pour aligner */
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+input,
+textarea {
+  flex: 1;
+  padding: 10px 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+textarea {
+  resize: none;
+  height: 100px;
+}
+
+form button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: var(--accent-green) !important;
+  color: var(--dark-gray) !important;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 300px;
+  transition: 1s;
+}
+
+form button:hover {
+  background-color: var(--primary-color) !important;
+  transition: 1s;
+}
+
+.modal-body {
+  margin: 60px 15px 0;
+  width: 80%;
+}
+
+.modal-header{
+  background: var(--primary-color) !important;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 80px;
+  position: absolute;
+  top: 0;
+}
+
+.modal-content {
+  background-color: var(--light-green) !important;
+}
+
+.modal-footer{
+  width:100%;
+  justify-content: center !important;
+}
+
+.modal-footer button,
+.modal-header button{
+  background-color: var(--primary-color) !important;
+}
+
+.modal-footer button:hover,
+.modal-header button:hover {
+  background-color: var(--accent-green) !important;
+  color: var(--dark-gray) !important;
+}
+
+.total{
+  margin: 50px 0 0 100px;
+}
+.total h5{
+  font-size: 30px;
+}
+
+/* @media screen and (max-width:768px) {
+  .modal-body {
+    display: block;
+  }
+} */
