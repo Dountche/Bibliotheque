@@ -35,35 +35,6 @@ $error  = $_GET['error']  ?? '';
         <a class="navbar-brand" href="accueil.php">
           <img src="./images/icon.png" alt="Logo INP-HB" class="d-inline-block align-text-top" style="max-height: 50px;">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" 
-                aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="Admin_home.php"><i class="fas fa-home"></i> Accueil</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="Gestion_Etudiant.php"><i class="fa-solid fa-user-graduate"></i> Étudiants</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="Gestion_Auteur.php"><i class="fa-solid fa-user"></i> Auteurs</a>
-            </li>
-            <li class="nav-item ">
-              <a class="nav-link" href="Gestion_Editeur.php"><i class="fa-solid fa-users"></i> Éditeurs</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="Gestion_Livre.php"><i class="fa-solid fa-book"></i> Livres</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="Gestion_Emprunt.php"><i class="fa-solid fa-ticket"></i> Emprunts</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="library.php" style="color : #fff ! important" ><i class="fa-solid fa-book-atlas"></i> Librairie</a>
-            </li>
-          </ul>
           <!-- Profil de l'utilisateur connecté -->
           <div class="d-flex align-items-center">
             <a href="#" data-bs-toggle="modal" data-bs-target="#accountModal" class="d-flex align-items-center text-decoration-none text-dark">
@@ -82,10 +53,12 @@ $error  = $_GET['error']  ?? '';
       </div>
     </nav>
   </header>
-
   <main class="container my-5">
-    <h2 class="mb-4 text-center">Librairie numérique</h2>
-    <!-- Feedback SweetAlert2 (inchangé) -->
+  <div class="text-center py-4">
+      <h1 class="display-4" style="color: #3d3d3d;">INP-HB Open Files</h1>
+      <p class="lead" style="font-size: 8px;">Tous les fichiers numeriques de votre institut sont disponibles ici</p>
+    </div>
+    <h2 class="mb-4 text-center"></h2>
     <script src="js/sweetalert2.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -127,13 +100,6 @@ $error  = $_GET['error']  ?? '';
           <option >Autre</option placeholder="preciser">
         </select>
       </div>
-      <?php if ($_SESSION['user']['roles']==='Admin'): ?>
-      <div class="col-md-4 text-end">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-          <i class="fa-solid fa-upload"></i> Ajouter un document
-        </button>
-      </div>
-      <?php endif; ?>
     </div>
 
     <div class="total d-flex justify-content-between align-items-center mb-2">
@@ -200,17 +166,6 @@ $error  = $_GET['error']  ?? '';
             <?php endif; ?>
           </div>
         </div>
-        <?php if($_SESSION['user']['roles']==='Admin'): ?>
-        <div class="card-footer text-end">
-          <a href="edit_document.php?idDoc=<?= $d['idDoc'] ?>"
-            class="btn btn-sm btn-warning"><i class="fa-solid fa-pen-to-square"></i></a>
-          <a href="del_document.php?idDoc=<?= $d['idDoc'] ?>"
-            class="btn btn-sm btn-danger"
-            onclick="return confirm('Confirmer la suppression ?')">
-            <i class="fa-solid fa-trash"></i>
-          </a>
-        </div>
-        <?php endif; ?>
       </div>
     </div>
     <?php endforeach; ?>
@@ -218,10 +173,9 @@ $error  = $_GET['error']  ?? '';
 
     <!-- PAGINATION (inchangée) -->
     <nav><ul id="pagination-container" class="pagination justify-content-center mt-4"></ul></nav>
-  </main>
-
-    <!-- Account Modal -->
-<div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+  </main>>
+  
+  <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -319,66 +273,8 @@ $error  = $_GET['error']  ?? '';
     </div>
   </div>
 </div>
-
-    <!-- Footer -->
-    <?php include '../src/views/footer.php'; ?>
-  <!-- Modal d’upload (inchangé) -->
-  <?php if($_SESSION['user']['roles']==='Admin'): ?>
-  <div class="modal fade" id="uploadModal" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <form method="POST" action="upload_document.php"
-            enctype="multipart/form-data" class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="uploadModalLabel">Ajouter un document</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" style="margin-top: 100px;">
-          <div class="mb-3">
-            <label class="form-label">Titre du document</label>
-            <input type="text" name="titre" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea name="description" class="form-control"></textarea>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Fichier</label>
-            <input type="file" name="fichier" class="form-control"
-                  accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.py,.php,.cpp,.html,.css,.js,.sql" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Catégorie</label>
-            <select name="categorie" class="form-select" required>
-              <option value="rapport">Rapport</option>
-              <option value="Cours">Cours</option>
-              <option value="rapport">Rapport</option>
-              <option value="Exercie">Exercice</option>
-              <option value="Corrigé">Corrigé</option>
-              <option value="guide">Guide</option>
-              <option value="Kpla">Guide</option>
-              <option value="roman">Roman</option>
-              <option value="Theâtre">Guide</option>
-              <option value="poésie">Guide</option>
-              <option value="Tutoriel">Tutoriel</option>
-              <option value="Codes">codes (.py, .php ...)</option>
-              <option value="other">Autre</option>
-            </select>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="telechargable" id="telech">
-            <label class="form-check-label" for="telech" style="width: 100%;">
-              Autoriser le téléchargement
-            </label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary">Uploader</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <?php endif; ?>
-
+  <!-- Footer -->
+  <?php include '../src/views/footer.php'; ?>
   <!-- SCRIPTS JS -->
   <script src="js/jquery-3.7.1.js"></script>
   <script src="js/jquery.simplePagination.js"></script>
@@ -407,7 +303,7 @@ $error  = $_GET['error']  ?? '';
   function openViewer(fileName) {
     window.open(`view_document.php?file=${fileName}`, '_blank');
   }
-  //-----------------------------------------------------------------------------------
+
   $(function(){
   // 1) Afficher/cacher le champ “Autre…”
   $('#filterCat').on('change', function(){
@@ -421,7 +317,7 @@ $error  = $_GET['error']  ?? '';
     refreshLibrary();
   });
 
-  // 2) Fonction de rafraîchissement AJAX
+
   function refreshLibrary(){
     const search   = $('#searchInput').val().trim();
     const category = $('#filterCat').val();
@@ -433,10 +329,10 @@ $error  = $_GET['error']  ?? '';
       dataType: 'json',
       data: { search, category, other },
       success(resp){
-        // Mise à jour du compteur
+
         $('#totalCount').text(resp.total);
 
-        // Reconstruction de la grille
+
         let html = '';
         resp.docs.forEach(d => {
           const esc = s => $('<div>').text(s).html();
@@ -444,8 +340,8 @@ $error  = $_GET['error']  ?? '';
           const isOffice = ['doc','docx','ppt','pptx']
             .some(ext => d.fichier.toLowerCase().endsWith(ext));
 
-          // Aperçu PDF
-          const preview = isPdf
+
+            const preview = isPdf
             ? `<div class="mb-2" style="height:200px;overflow:hidden">
                  <iframe src="documents/${encodeURIComponent(d.fichier)}"
                          width="100%" height="100%" style="border:none;"></iframe>
@@ -497,19 +393,6 @@ $error  = $_GET['error']  ?? '';
                     ${dlBtn}
                   </div>
                 </div>
-                <?php if($_SESSION['user']['roles']==='Admin'): ?>
-                <div class="card-footer text-end">
-                  <a href="edit_document.php?idDoc=${d.idDoc}"
-                     class="btn btn-sm btn-warning">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </a>
-                  <a href="del_document.php?idDoc=${d.idDoc}"
-                     class="btn btn-sm btn-danger"
-                     onclick="return confirm('Confirmer ?')">
-                    <i class="fa-solid fa-trash"></i>
-                  </a>
-                </div>
-                <?php endif; ?>
               </div>
             </div>`;
         });
@@ -517,6 +400,7 @@ $error  = $_GET['error']  ?? '';
         $('#docsGrid').html(html);
         // relancer votre pagination si nécessaire
         if (typeof pager !== 'undefined') pager.refresh()
+        reloadGrid(html);
       }
     });
   }
@@ -527,6 +411,7 @@ $error  = $_GET['error']  ?? '';
 
   // 4) Chargement initial
   refreshLibrary();
+  reloadGrid(html);
 });
 
     //---------------------------------------------------

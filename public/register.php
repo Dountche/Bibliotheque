@@ -51,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         // Insertion dans la table User
-        $stmt = $pdo->prepare("INSERT INTO User (usermail, passwd, roles) VALUES (?, ?, ?)");
-        $stmt->execute([$email, $hashed_password, $role]);
+        $stmt = $pdo->prepare("INSERT INTO User (usermail, nom, prenom, passwd, roles) VALUES (?, ?, ?)");
+        $stmt->execute([$email, $nom, $prenoms, $hashed_password, $role]);
 
         // Récupérer l'ID inséré pour l'utilisateur
         $idUser = $pdo->lastInsertId();
