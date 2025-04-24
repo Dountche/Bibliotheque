@@ -12,7 +12,7 @@ $success = isset($_GET['success']);
 // Vérifier que la requête est de type POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Récupérer le rôle et les données du formulaire
-    $role             = $_POST['role'] ?? 'etudiant';
+    $role             = $_POST['role'] ?? 'Etudiant';
     $nom              = trim($_POST['nom'] ?? '');
     $prenoms          = trim($_POST['prenoms'] ?? '');
     $matricule        = trim($_POST['matricule'] ?? '');
@@ -45,20 +45,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         header('Location: login.php?error=email_exists');
         exit();
     }
+
+    $refmin = DateTime::createFromFormat('Y-m-d', '1960-01-01');
+    $refmax = DateTime::createFromFormat('Y-m-d', '2008-01-01');
+    $age  = DateTime::createFromFormat('Y-m-d', $dateNaiss);
+
+    if ($age < $refmin || $age > $refmax) {
+        header('Location: login.php?error=age_invalid');
+        exit();
+    }
     
     // Hachage du mot de passe en utilisant BCRYPT
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
     try {
         // Insertion dans la table User
-        $stmt = $pdo->prepare("INSERT INTO User (usermail, nom, prenom, passwd, roles) VALUES (?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO User (usermail, nom, prenom, passwd, roles) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$email, $nom, $prenoms, $hashed_password, $role]);
 
         // Récupérer l'ID inséré pour l'utilisateur
         $idUser = $pdo->lastInsertId();
 
         // Insertion dans la table spécifique en fonction du rôle
-        if ($role === 'admin') {
+        if ($role === 'Admin') {
             $stmt = $pdo->prepare("INSERT INTO Administrateur (matAdmin, prenoms, nom, born, sexe, mail, tel, idUser) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$matricule, $prenoms, $nom, $dateNaiss, $sexe, $email, $tel, $idUser]);
         } else {

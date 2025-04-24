@@ -4,6 +4,16 @@
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
+
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
+if (empty($_SESSION['user'])) {
+  header('Location: index.php?page=default');
+  exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -15,6 +25,8 @@ if (session_status() === PHP_SESSION_NONE) {
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome -->
+  <link rel="icon" href="./images/icon.png">
+  <link rel="apple-touch-icon" href="./images/icon.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Feuille de style personnalisée -->
   <link rel="stylesheet" href="./css/styles.css">
@@ -24,7 +36,7 @@ if (session_status() === PHP_SESSION_NONE) {
   <header>
     <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
       <div class="container-fluid">
-        <a class="navbar-brand" href="accueil.php">
+        <a class="navbar-brand" href="https://inphb.ci/">
           <img src="./images/icon.png" alt="Logo INP-HB" class="d-inline-block align-text-top" style="max-height: 50px;">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
@@ -110,7 +122,7 @@ if (session_status() === PHP_SESSION_NONE) {
             <i class="fa-solid fa-ticket fa-3x mb-3" style="color: var(--secondary-color);"></i>
             <h5 class="card-title">Gestion Emprunts</h5>
             <p class="card-text">Suivre et gérer les emprunts de livres.</p>
-            <a href="GEstion_Emprunter.php" class="btn btn-warning">Voir plus</a>
+            <a href="Gestion_Emprunt.php" class="btn btn-warning">Voir plus</a>
           </div>
         </div>
       </div>

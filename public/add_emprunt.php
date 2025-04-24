@@ -16,14 +16,36 @@ $dateret            = trim($_POST['dateret'] ?? '');
 
 $stmt = $pdo->prepare("SELECT idEtu FROM Etudiant WHERE matEtu = ?");
 $stmt->execute([$matricule]);
-$result = $stmt->fetchColumn();
-$idEtu = $result !== false ? (int) $result : 0;
+$idEtu = (int)$stmt->fetchColumn();
 
 if ($idEtu<=0) {
     header('Location: Gestion_Emprunt.php?error=etudiant_unknown');
     exit();
 
 }
+
+if ($idLiv<=0) {
+    header('Location: Gestion_Emprunt.php?error=livre_unknown');
+    exit();
+
+} else {
+    $stmt = $pdo->prepare("SELECT disponible FROM Livre WHERE idLiv = ?");
+    $stmt->execute([$idLiv]);
+    $disponible = (int)$stmt->fetchColumn();
+    if ($disponible <= 0) {
+        header('Location: Gestion_Emprunt.php?error=livre_indisponible');
+        exit();
+    }
+}
+
+$empDate  = DateTime::createFromFormat('Y-m-d', $datemp);
+$retDate  = DateTime::createFromFormat('Y-m-d', $dateret);
+
+if ($retDate <= $empDate) {
+    header('Location: Gestion_Emprunt.php?error=date_inferieur');
+    exit();
+}
+
 
 $stmt = $pdo->prepare("SELECT * FROM Emprunt WHERE idLiv = ? AND idEtu = ?");
 $stmt->execute([$idLiv, $idEtu]);
@@ -33,13 +55,29 @@ if ($stmt->rowCount() > 0) {
 }
 
 try {
-    $stmt = $pdo->prepare("INSERT INTO Emprunt (idEtu, idLiv, dateEmp, dateRetour) VALUES (?, ?, ?, ?)");
+    $pdo->beginTransaction();
 
+    $stmt = $pdo->prepare(
+        "INSERT INTO Emprunt (idEtu, idLiv, dateEmp, dateRetour)
+        VALUES (?, ?, ?, ?)"
+    );
     $stmt->execute([$idEtu, $idLiv, $datemp, $dateret]);
+
+    $stmt = $pdo->prepare(
+        "UPDATE Livre
+            SET disponible = disponible - 1
+        WHERE idLiv = ?
+        AND disponible > 0"
+    );
+    $stmt->execute([$idLiv]);
+    $pdo->commit();
 
     header('Location: Gestion_Emprunt.php?action=add&status=success');
     exit();
 } catch (Exception $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     header('Location: Gestion_Emprunt.php?action=add&status=error');
     exit;
 }

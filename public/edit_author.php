@@ -22,6 +22,15 @@ if ($idAut <= 0) {
     exit;
 }
 
+$refmax = DateTime::createFromFormat('Y-m-d', '2005-01-01');
+$age  = DateTime::createFromFormat('Y-m-d', $born);
+
+if ($age > $refmax) {
+    header('Location: Gestion_Auteur.php?error=age_invalid');
+    exit();
+}
+
+
 try {
     $stmt = $pdo->prepare("
         UPDATE Auteur SET

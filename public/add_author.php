@@ -25,6 +25,14 @@ if ($stmt->rowCount() > 0) {
     exit();
 }
 
+$refmax = DateTime::createFromFormat('Y-m-d', '2005-01-01');
+$age  = DateTime::createFromFormat('Y-m-d', $dateNaiss);
+
+if ($age > $refmax) {
+    header('Location: Gestion_Auteur.php?error=age_invalid');
+    exit();
+}
+
 try {
     $stmt = $pdo->prepare("INSERT INTO Auteur (nom, prenom, sexe, born, types, pays, biographie) VALUES (?, ?, ?, ?, ?, ?, ?)");
 

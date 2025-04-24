@@ -53,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="./css/styles.css" rel="stylesheet">
+<link rel="icon" href="./images/icon.png">
+<link rel="apple-touch-icon" href="./images/icon.png">
 <!-- jQuery + SweetAlert2 -->
 <script src="./js/jquery-3.7.1.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -61,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div class="container-fluid">
-        <a class="navbar-brand" href="accueil.php">
+        <a class="navbar-brand" href="https://inphb.ci/">
           <img src="./images/icon.png" alt="Logo INP-HB" style="max-height: 50px;">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -119,8 +121,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="mb-3">
             <label for="registerRole" class="form-label">Vous êtes :</label>
             <select name="role" id="registerRole" class="form-select">
-              <option value="etudiant" selected>Etudiant</option>
-              <option value="admin">Admin</option>
+              <option value="Etudiant" selected>Etudiant</option>
+            <option value="Admin">Admin</option>
             </select>
           </div>
           <!-- Champs communs -->
@@ -141,8 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="sexe" class="form-label">Sexe *</label>
             <select id="sexe" name="sexe" class="form-select" required>
               <option value="" disabled selected>M/F</option>
-              <option value="masculin">M</option>
-              <option value="feminin">F</option>
+              <option value="M">M</option>
+              <option value="F">F</option>
             </select>
           </div>
           <div class="mb-3">
@@ -237,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $(document).ready(function(){
     // 2. Gestion du changement de rôle dans le modal d’inscription
     $('#registerRole').on('change', function(){
-    if ($(this).val() === 'admin') {
+    if ($(this).val() === 'Admin') {
       // masquer temporairement le modal pour éviter conflit
       $('#registerModal').modal('hide');
       // afficher SweetAlert2
@@ -256,7 +258,7 @@ $(document).ready(function(){
           $('#formEtudiant').hide();
         } else {
           Swal.fire('Clé incorrecte', 'Vous restez en mode Étudiant', 'error');
-          $('#registerRole').val('etudiant');
+          $('#registerRole').val('Etudiant');
           $('#formEtudiant').show();
         }
       });
@@ -296,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const messages = {
         email_exists:      { title: 'Email déjà utilisé',     text: 'Cet email existe déjà.'},
         password_mismatch: { title: 'mot de passe Incorrect', text: ' Les mots de passes ne correspondent pas.'},
+        age_invalid:       { title: 'Age invalide',            text: 'Date de naissance comprise entre 1960 et 2008'},
       };
       Swal.fire({
         icon: 'error',

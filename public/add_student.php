@@ -45,14 +45,24 @@ if ($stmt->rowCount() > 0) {
     exit();
 }
 
+$refmin = DateTime::createFromFormat('Y-m-d', '1960-01-01');
+$refmax = DateTime::createFromFormat('Y-m-d', '2008-01-01');
+$age  = DateTime::createFromFormat('Y-m-d', $dateNaiss);
+
+if ($age < $refmin || $age > $refmax) {
+    header('Location: Gestion_Etudiant.php?error=age_invalid');
+    exit();
+}
+
+
 // Hachage du mot de passe en utilisant BCRYPT
 $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
 
 try {
     // Insertion dans la table User
-    $stmt = $pdo->prepare("INSERT INTO User (usermail, passwd, roles) VALUES (?, ?, ?)");
-    $stmt->execute([$email, $hashed_password, $role]);
+    $stmt = $pdo->prepare("INSERT INTO User (usermail, nom, prenom,  passwd, roles) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([$email, $nom, $prenoms, $hashed_password, $role]);
 
     $idUser = $pdo->lastInsertId();
 

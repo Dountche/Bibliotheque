@@ -27,6 +27,15 @@ if ($idEtu <= 0) {
     exit;
 }
 
+$refmin = DateTime::createFromFormat('Y-m-d', '1960-01-01');
+$refmax = DateTime::createFromFormat('Y-m-d', '2008-01-01');
+$age  = DateTime::createFromFormat('Y-m-d', $born);
+
+if ($age < $refmin || $age > $refmax) {
+    header('Location: Gestion_Etudiant.php?error=age_invalid');
+    exit();
+}
+
 try {
     $stmt = $pdo->prepare("
         UPDATE Etudiant SET

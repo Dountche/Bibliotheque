@@ -1,5 +1,16 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
+if (empty($_SESSION['user'])) {
+  header('Location: index.php?page=default');
+  exit;
+}
 require_once __DIR__ . '/../config/database.php';
 
 $stmt = $pdo->prepare("
@@ -37,6 +48,8 @@ $status = $_GET['status'] ?? null;      // 'success', 'error'
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- SweetAlert2 CSS local -->
+  <link rel="icon" href="./images/icon.png">
+  <link rel="apple-touch-icon" href="./images/icon.png">
   <link rel="stylesheet" href="css/sweetalert2.min.css">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -49,7 +62,7 @@ $status = $_GET['status'] ?? null;      // 'success', 'error'
   <header>
     <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
       <div class="container-fluid">
-        <a class="navbar-brand" href="accueil.php">
+        <a class="navbar-brand" href="https://inphb.ci/">
           <img src="./images/icon.png" alt="Logo INP-HB" class="d-inline-block align-text-top" style="max-height: 50px;">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
@@ -382,9 +395,15 @@ $status = $_GET['status'] ?? null;      // 'success', 'error'
 
     if (error) {
       const messages = {
-        invalid_id:       { title: 'ID invalide',           text: 'Aucun enregistrement ne correspond.',},
-        emprunt_exists:   { title: 'Emprunt existant',       text: 'Cet emprunt est déjà enregistré.'},
-        etudiant_unknown: { title: 'Étudiant inconnu',       text: 'Aucun étudiant n’a ce matricule.'},
+        invalid_id:             { title: 'ID invalide',                 text: 'Aucun enregistrement ne correspond.',},
+        emprunt_exists:         { title: 'Emprunt existant',            text: 'Cet emprunt est déjà enregistré.'},
+        etudiant_unknown:       { title: 'Étudiant inconnu',            text: 'Aucun étudiant n’a ce matricule.'},
+        livre_unknown:          { title: 'Livre inconnu',               text: 'Aucun livre n’a identifant. '},
+        livre_indavailable:     { title: 'Livre nondisponible',         text: 'tous les exemplaires de  livres ont été emprunter'},
+        date_inferieur:         { title: 'Date invalide',               text: 'La date de retour doit être postérieure à la date d\'emprunt.'},
+        dateren_inferieur:      { title: 'Date invalide',               text: 'La date de rendu doit être postérieure à la date d\'emprunt.'},
+        not_found:              { title: 'Ereur d\'enregistrement',     text: 'L\'enregistrement est corrompu.'},
+        dateren_supjj:          { title: 'Date invalide',               text: 'La date de rendu ne peut pas être postérieure à Aujourd\'hui.'},
       };
       Swal.fire({
         icon: 'error',

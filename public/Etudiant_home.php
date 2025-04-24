@@ -1,5 +1,16 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
+if (empty($_SESSION['user'])) {
+  header('Location: index.php?page=default');
+  exit;
+}
 require_once __DIR__ . '/../config/database.php';
 
 // 1) Récupère tous les documents
@@ -21,6 +32,8 @@ $error  = $_GET['error']  ?? '';
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- SweetAlert2 CSS -->
+  <link rel="icon" href="./images/icon.png">
+  <link rel="apple-touch-icon" href="./images/icon.png">
   <link rel="stylesheet" href="css/sweetalert2.min.css">
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,7 +45,7 @@ $error  = $_GET['error']  ?? '';
   <header>
     <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
       <div class="container-fluid">
-        <a class="navbar-brand" href="accueil.php">
+        <a class="navbar-brand" href="https://inphb.ci/">
           <img src="./images/icon.png" alt="Logo INP-HB" class="d-inline-block align-text-top" style="max-height: 50px;">
         </a>
           <!-- Profil de l'utilisateur connecté -->
@@ -79,7 +92,7 @@ $error  = $_GET['error']  ?? '';
 
     <!-- Recherche / Filtre (inchangé) -->
 <!-- RECHERCHE / FILTRE -->
-<div class="row g-3 mb-4">
+    <div class="row g-3 mb-4">
       <div class="col-md-4">
         <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par titre">
       </div>
@@ -87,19 +100,23 @@ $error  = $_GET['error']  ?? '';
         <select id="filterCat" class="form-select">
           <option value="">Filtrer par catégorie</option>
           <option value="Cours">Cours</option>
-          <option value="rapport">Rapport</option>
-          <option value="Exercie">Exercice</option>
+          <option value="Rapport">Rapport</option>
+          <option value="Exercice">Exercice</option>
           <option value="Corrigé">Corrigé</option>
-          <option value="guide">Guide</option>
-          <option value="Kpla">Guide</option>
-          <option value="roman">Roman</option>
-          <option value="Theâtre">Guide</option>
-          <option value="poésie">Guide</option>
+          <option value="Guide">Guide</option>
+          <option value="Kpla">Kpla</option>
+          <option value="Roman">Roman</option>
+          <option value="Theâtre">Theâtre</option>
+          <option value="Poésie">Poésie</option>
           <option value="Tutoriel">Tutoriel</option>
           <option value="Codes">codes (.py, .php ...)</option>
-          <option >Autre</option placeholder="preciser">
+          <option value="other">Autre</option placeholder="preciser">
         </select>
+        <div class="col-md-4" id="otherCatContainer" style="display:none;">
+            <input type="text" id="otherCat" class="form-control" placeholder="Préciser la catégorie">
+        </div>
       </div>
+
     </div>
 
     <div class="total d-flex justify-content-between align-items-center mb-2">
@@ -273,8 +290,8 @@ $error  = $_GET['error']  ?? '';
     </div>
   </div>
 </div>
-  <!-- Footer -->
-  <?php include '../src/views/footer.php'; ?>
+
+
   <!-- SCRIPTS JS -->
   <script src="js/jquery-3.7.1.js"></script>
   <script src="js/jquery.simplePagination.js"></script>
@@ -284,224 +301,7 @@ $error  = $_GET['error']  ?? '';
   <script src="js/jquery-3.7.1.min.js"></script>
   <script src="js/ajax_account.js"></script>
   <script src="js/sweetalert2.min.js"></script>
-  <script>
-    // Ouvre un embed en plein écran
-    function viewDoc(btn) {
-      const card = btn.closest('.doc-card');
-      const file = card.dataset.file;
-      // Crée une fenêtre modale simple
-      const modal = document.createElement('div');
-      modal.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000e;display:flex;justify-content:center;align-items:center;';
-      modal.innerHTML = `
-        <embed src="documents/${file}" type="application/pdf" width="80%" height="90%">
-        <button style="position:absolute;top:20px;right:20px;font-size:2rem;color:white;background:none;border:none;cursor:pointer;">&times;</button>
-      `;
-      modal.querySelector('button').onclick = () => modal.remove();
-      document.body.appendChild(modal);
-    }
 
-  function openViewer(fileName) {
-    window.open(`view_document.php?file=${fileName}`, '_blank');
-  }
-
-  $(function(){
-  // 1) Afficher/cacher le champ “Autre…”
-  $('#filterCat').on('change', function(){
-    if (this.value === 'other') {
-      $('#otherCatContainer').show();
-      $('#otherCat').attr('required', true);
-    } else {
-      $('#otherCatContainer').hide();
-      $('#otherCat').removeAttr('required').val('');
-    }
-    refreshLibrary();
-  });
-
-
-  function refreshLibrary(){
-    const search   = $('#searchInput').val().trim();
-    const category = $('#filterCat').val();
-    const other    = $('#otherCat').val().trim();
-
-    $.ajax({
-      url: 'ajax_document.php',
-      method: 'GET',
-      dataType: 'json',
-      data: { search, category, other },
-      success(resp){
-
-        $('#totalCount').text(resp.total);
-
-
-        let html = '';
-        resp.docs.forEach(d => {
-          const esc = s => $('<div>').text(s).html();
-          const isPdf   = d.typeMime.includes('pdf');
-          const isOffice = ['doc','docx','ppt','pptx']
-            .some(ext => d.fichier.toLowerCase().endsWith(ext));
-
-
-            const preview = isPdf
-            ? `<div class="mb-2" style="height:200px;overflow:hidden">
-                 <iframe src="documents/${encodeURIComponent(d.fichier)}"
-                         width="100%" height="100%" style="border:none;"></iframe>
-               </div>`
-            : '';
-
-          // Bouton Lire en ligne
-          let lireBtn;
-          if (isPdf) {
-            lireBtn = `<button onclick="openViewer('${esc(d.fichier)}')"
-                             class="btn btn-outline-primary btn-sm w-100 mb-2">
-                         Lire en ligne
-                       </button>`;
-          } else if (isOffice) {
-            const fullUrl = encodeURIComponent(location.origin + '/documents/' + d.fichier);
-            lireBtn = `<button onclick="window.open(
-                            'https://docs.google.com/viewer?url=${fullUrl}&embedded=true',
-                            '_blank')"
-                          class="btn btn-outline-primary btn-sm w-100 mb-2">
-                          Lire en ligne
-                        </button>`;
-          } else {
-            lireBtn = `<a href="documents/${esc(d.fichier)}" target="_blank"
-                          class="btn btn-outline-secondary btn-sm w-100 mb-2">
-                          Voir le fichier
-                        </a>`;
-          }
-
-          // Bouton Télécharger
-          const dlBtn = d.telechargable
-            ? `<a href="documents/${esc(d.fichier)}" download
-                  class="btn btn-success btn-sm w-100">Télécharger</a>`
-            : `<button class="btn btn-secondary btn-sm w-100" disabled>
-                 Téléchargement interdit
-               </button>`;
-
-          html += `
-            <div class="col doc-card" data-categorie="${esc(d.categorie)}" data-titre="${esc(d.titre).toLowerCase()}">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body d-flex flex-column">
-                  <h5 class="card-title">${esc(d.titre)}</h5>
-                  ${preview}
-                  ${d.description ? `<p class="card-text">${esc(d.description)}</p>` : ''}
-                  <small class="text-muted mb-3">
-                    Publié le ${new Date(d.dateUpload).toLocaleDateString('fr-FR')}
-                  </small>
-                  <div class="mt-auto">
-                    ${lireBtn}
-                    ${dlBtn}
-                  </div>
-                </div>
-              </div>
-            </div>`;
-        });
-
-        $('#docsGrid').html(html);
-        // relancer votre pagination si nécessaire
-        if (typeof pager !== 'undefined') pager.refresh()
-        reloadGrid(html);
-      }
-    });
-  }
-
-  // 3) Lier la recherche au champ
-  $('#searchInput, #otherCat').on('input', refreshLibrary);
-  $('#filterCat').on('change', refreshLibrary);
-
-  // 4) Chargement initial
-  refreshLibrary();
-  reloadGrid(html);
-});
-
-    //---------------------------------------------------
-
-    $(function(){
-  /**
-   * Initialise la pagination pour une grille de cartes (#docsGrid .doc-card)
-   * @param {number} perPage — nombre d’items par page
-   * @returns {Object} — { refresh(): void }
-   */
-  function setupGridPagination(perPage) {
-    let $items, total, pages, currentPage;
-
-    // Recalcule le nombre de pages et remet currentPage à 1
-    function recalc() {
-      // On ne prend que les cartes visibles (filtrage appliqué)
-      $items      = $('#docsGrid .doc-card:visible');
-      total       = $items.length;
-      pages       = Math.ceil(total / perPage) || 1;
-      currentPage = 1;
-    }
-
-    // Affiche la page demandée
-    function showPage(page) {
-      recalc();
-      const start = (page - 1) * perPage;
-      const end   = start + perPage;
-      $items.hide().slice(start, end).show();
-      currentPage = page;
-      renderPager();
-    }
-
-    // Construit les boutons Précédent / Numéros / Suivant
-    function renderPager() {
-      const $pager = $('#pagination-container').empty();
-      if (pages <= 1) return;  // pas de pagination si <= 1 page
-
-      // « Précédent »
-      if (currentPage > 1) {
-        $pager.append(`
-          <li class="page-item">
-            <a class="page-link" href="#" data-page="${currentPage-1}">&laquo; Précedent</a>
-          </li>`);
-      }
-
-      // numéros
-      for (let p = 1; p <= pages; p++) {
-        const active = (p === currentPage) ? ' active' : '';
-        $pager.append(`
-          <li class="page-item${active}">
-            <a class="page-link" href="#" data-page="${p}">${p}</a>
-          </li>`);
-      }
-
-      // « Suivant »
-      if (currentPage < pages) {
-        $pager.append(`
-          <li class="page-item">
-            <a class="page-link" href="#" data-page="${currentPage+1}">Suivant &raquo;</a>
-          </li>`);
-      }
-    }
-
-    $('#pagination-container')
-      .off('click.gridPg')
-      .on('click.gridPg', 'a.page-link', function(e){
-        e.preventDefault();
-        const p = parseInt($(this).data('page'), 10);
-        if (p && p !== currentPage) showPage(p);
-      });
-
-    // API publique
-    return {
-      refresh() {
-        recalc();
-        showPage(1);
-      }
-    };
-  }
-
-  const pager = setupGridPagination(2);
-  pager.refresh();
-
-  function reloadGrid(newRowsHtml) {
-    $('#authorTable tbody').html(newRowsHtml);
-    pager.refresh();
-  }
-
-});
-
-  </script>
+  <script src="js/librairy.js"></script>
 </body>
 </html>

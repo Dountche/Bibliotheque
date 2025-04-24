@@ -25,6 +25,35 @@ if ($stmt->rowCount() > 0) {
     exit();
 }
 
+$stmt = $pdo->prepare("SELECT idAut FROM Auteur WHERE  idAut = ? ");
+$stmt->execute([$idAut]);
+if ($stmt->rowCount() < 0) {
+    header('Location: Gestion_Livre.php?error=auteur_unknown');
+    exit();
+}
+
+$stmt = $pdo->prepare("SELECT idEdit FROM Editeur WHERE  idEdit = ?");
+$stmt->execute([$idEdit]);
+if ($stmt->rowCount() < 0) {
+    header('Location: Gestion_Livre.php?error=editeur_unknown');
+    exit();
+}
+
+
+if ($disponible > $exemplaire) {
+    header('Location: Gestion_Livre.php?error=nbexemplaire_inferieur');
+    exit();
+}
+
+if ($disponible < 0){
+    header('Location: Gestion_Livre.php?error=disponible_inferieur');
+    exit();
+}
+if ($exemplaire <0 ){
+    header('Location: Gestion_Livre.php?error=exemplaire_inferieur');
+    exit();
+}
+
 try {
     $stmt = $pdo->prepare("INSERT INTO Livre (idAut, idEdit, titre, genre, datepub, disponible, nbExemplaire ) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
